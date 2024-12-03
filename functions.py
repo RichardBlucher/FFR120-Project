@@ -4,6 +4,8 @@ from matplotlib import pyplot as plt
 import math
 from tkinter import *
 import time
+import matplotlib.animation as animation
+
 
 
 def sense(x, y, theta, SA, SO, trailmap, mapsize, foodmap, RA, bc_type):
@@ -180,7 +182,7 @@ def boundary_conditions(x, y, theta, mapsize, bc_type):
     
     return x, y, theta
 
-def animation_initialization(x, y, theta, mapsize):
+def agent_animation_initialization(x, y, theta, mapsize):
     '''
     Function for initializing the agent animation.
 
@@ -242,7 +244,7 @@ def animation_initialization(x, y, theta, mapsize):
     
     return particles, velocities, canvas, tk
 
-def update_animation(step, N_skip, particles, velocities, canvas, tk, x, y, theta, mapsize):
+def agent_update_animation(step, N_skip, particles, velocities, canvas, tk, x, y, theta, mapsize):
     '''
     Function for updating the agent animation.
 
@@ -288,6 +290,71 @@ def update_animation(step, N_skip, particles, velocities, canvas, tk, x, y, thet
         tk.update_idletasks()
         tk.update()
         time.sleep(0)  # Increase to slow down the simulation.   
+
+def trail_animation_initialization():
+    '''
+    Function for initializing the trail animation.
+
+    Inputs:
+    none
+
+    Outputs:
+    fig - Figure object, for showing the trail plot
+    ax - Axes object, for making the trail plot
+    ims - list, will contain the AxesImages from imshow() in trail_update_animation
+    '''
+    fig, ax = plt.subplots()
+    ims = []
+    return fig, ax, ims
+
+def trail_update_animation(ax, trailmap, step, ims):
+    '''
+    Function for updating the trail animation.
+
+    Inputs:
+    ax - Axes object, for making the trail plot
+    trailmap - np.array(mapsize, mapsize), matrix with trail values
+    step - int, current step (iteration) of the simulation
+    ims - list, contains the AxesImages from imshow()
+
+    Output:
+    none
+    '''
+    im = ax.imshow(trailmap, animated=True)
+    if step == 0:
+        ax.imshow(trailmap)  # Show an initial one first
+    ims.append([im])
+
+def trail_animation_show_save(fig, ims, show_trail_animation, save_trail_animation, trail_animation_name):
+    '''
+    Function for showing and/or saving the trail animation.
+
+    Inputs:
+    fig - Figure object, for showing the trail plot
+    ims - list, contains the AxesImages from imshow()
+    show_trail_animation - boolean, True will show the animation at end of run
+    save_trail_animation - boolean, True will save the animation at end of run
+    trail_animation_name - string, name and path of saved animation
+
+    Outputs:
+    none
+
+    TODO: Make it possible to save as .mp4 (should be possible)
+    '''
+    ani = animation.ArtistAnimation(fig, ims, interval=50, blit=True,
+                                repeat_delay=1000)
+    if show_trail_animation:
+        plt.show()
+    if save_trail_animation:
+        writergif = animation.PillowWriter(fps=30)
+        ani.save(trail_animation_name, writer=writergif)
+
+
+
+
+
+
+
 
 '''
 TODO: Write function for plotting trailmaps at several times (like the figures in J. Jones)
