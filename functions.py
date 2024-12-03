@@ -206,9 +206,6 @@ def agent_animation_initialization(x, y, theta, mapsize):
     vp = 1  # Length of the arrow indicating the velocity direction.
     line_width = 1  # Width of the arrow line.
 
-    #N_skip = 1
-
-    
     tk = Tk()
     tk.geometry(f'{window_size + 20}x{window_size + 20}')
     tk.configure(background='#000000')
@@ -312,7 +309,7 @@ def trail_update_animation(ax, trailmap, step, ims):
     Function for updating the trail animation.
 
     Inputs:
-    ax - Axes object, for making the trail plot
+    ax - Axes object, for making the trail animation
     trailmap - np.array(mapsize, mapsize), matrix with trail values
     step - int, current step (iteration) of the simulation
     ims - list, contains the AxesImages from imshow()
@@ -330,7 +327,7 @@ def trail_animation_show_save(fig, ims, show_trail_animation, save_trail_animati
     Function for showing and/or saving the trail animation.
 
     Inputs:
-    fig - Figure object, for showing the trail plot
+    fig - Figure object, for showing the trail animation
     ims - list, contains the AxesImages from imshow()
     show_trail_animation - boolean, True will show the animation at end of run
     save_trail_animation - boolean, True will save the animation at end of run
@@ -349,6 +346,50 @@ def trail_animation_show_save(fig, ims, show_trail_animation, save_trail_animati
         writergif = animation.PillowWriter(fps=30)
         ani.save(trail_animation_name, writer=writergif)
 
+def trail_plot_initialization(steps_to_plot):
+    '''
+    Function for initializing the trail plots.
+
+    Input:
+    steps_to_plot - list with ints, the desiered times to plot
+
+    Output:
+    fig - Figure object, for showing the trail plots
+    axs - list of Axes objects, for making the trail plots
+    '''
+    nr_of_plots = len(steps_to_plot)
+    fig, axs = plt.subplots(nrows=1, ncols=nr_of_plots, figsize=(nr_of_plots*3, 3), layout='constrained')
+    #fig.suptitle('Configuration of the system at different t')
+    i_fig = 0
+    for step in steps_to_plot:
+        axs[i_fig].set_title(f't = {step}')
+        axs[i_fig].set_xlabel('x')
+        axs[i_fig].set_ylabel('y')
+        i_fig += 1
+    
+    return fig, axs
+
+
+def plot_trailmap(steps_to_plot, trailmap, step, axs):
+    '''
+    Function to plot trailmaps at different times.
+
+    Inputs:
+    steps_to_plot - list with ints, the desiered times to plot
+    trailmap - np.array(mapsize, mapsize), matrix with trail values
+    step - int, current step (iteration) of the simulation
+    axs - list of Axes objects, for making the trail plots
+
+    Output:
+    none
+    '''
+    if step in steps_to_plot:
+        axs[steps_to_plot.index(step)].imshow(trailmap)
+    if step == steps_to_plot[-1]:
+        plt.show()
+
+
+
 
 
 
@@ -357,8 +398,9 @@ def trail_animation_show_save(fig, ims, show_trail_animation, save_trail_animati
 
 
 '''
-TODO: Write function for plotting trailmaps at several times (like the figures in J. Jones)
+TODO: Make the plot and animation functions better. Ex. could probably combine the initialization and actual plot functions to one, give more options (*kwargs?), better possibilities for saving, etc.
 TODO: Make the food work well
-TODO: Optimizations
+TODO: Optimizations (find what is slow and make it faster)
 TODO: Other TODOs in the functions above
+TODO: Make it so that the function run_simulation in main.py doesn't need as many arguments
 '''
