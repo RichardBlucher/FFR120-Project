@@ -79,6 +79,8 @@ def deposit(x, y, trailmap, depT):
 
     Output:
     trailmap - np.array(mapsize, mapsize), matrix with updated trail values
+
+    TODO: Should it be += depT instead of = depT???
     '''
     for i in range(len(x)):
         trailmap[int(np.round(x[i])), int(np.round(y[i]))] = depT
@@ -317,9 +319,9 @@ def trail_update_animation(ax, trailmap, step, ims):
     Output:
     none
     '''
-    im = ax.imshow(trailmap, animated=True)
+    im = ax.imshow(trailmap, animated=True, cmap = 'Greys')
     if step == 0:
-        ax.imshow(trailmap)  # Show an initial one first
+        ax.imshow(trailmap, cmap = 'Greys')  # Show an initial one first
     ims.append([im])
 
 def trail_animation_show_save(fig, ims, show_trail_animation, save_trail_animation, trail_animation_name):
@@ -398,6 +400,7 @@ def plot_trailmap(steps_to_plot, trailmap, step, axs):
 
 
 '''
+TODO: Figure out the "volume exclution"-like thing that J: Jones maybe uses and if so implement it.
 TODO: Make the plot and animation functions better. Ex. could probably combine the initialization and actual plot functions to one, give more options (*kwargs?), better possibilities for saving, etc.
 TODO: Make the food work well
 TODO: Optimizations (find what is slow and make it faster)
