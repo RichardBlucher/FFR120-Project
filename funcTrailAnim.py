@@ -258,17 +258,17 @@ def trail_update_animation(step, combined_map, canvas, canvas_img, tk_trail, pal
     tk_trail.update()
     tk_trail.title(f'Iteration {step}')
 
-def store_trail_animation(step, combined_map, canvas, canvas_img, palette):
+def store_trail_animation(step, combined_map, palette):
     """
-    Updates the trailmap image on the trail canvas.
+    Returns the trailmap image for stroring.
 
     Inputs:
     step - Fow showing iteration step in animation
     combined_map - trailmap or trailmap combined with food
-    canvas - Animation window
-    canvas_img - Image placed on canvas
-    tk_trail - tk for the trailmap
     palette - Color palette for the visualization
+
+    Output:
+    scaled_map - Image to be saved for making mp4
 
     """
 
@@ -279,18 +279,25 @@ def store_trail_animation(step, combined_map, canvas, canvas_img, palette):
     image = Image.fromarray(normalized_trailmap, mode='P')
     image.putpalette([item for sublist in palette for item in sublist])
     scaled_map = image.resize((window_size, window_size), Image.Resampling.NEAREST)
-    tk_img = ImageTk.PhotoImage(scaled_map)
 
     scaled_map = scaled_map.convert("RGB")
 
     return scaled_map
 
-def save_trail_animation(trail_imgs, filename, fps=30):
+def save_trail_animation(trail_imgs, filename):
+    """
+    Makes mp4 from trail images
 
+    Inputs:
+    trail_imgs - list of trail images
+    filename - name of file
+
+    """
+    fps = 30
     frame_size = np.array(trail_imgs[0]).shape[:2][::-1]
 
-    forcc = cv2.VideoWriter_fourcc(*'mp4v')
-    out = cv2.VideoWriter(filename, forcc, fps, frame_size)
+    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+    out = cv2.VideoWriter(filename, fourcc, fps, frame_size)
 
     for trail_img in trail_imgs:
         rgb_frame = cv2.cvtColor(np.array(trail_img), cv2.COLOR_RGB2BGR)

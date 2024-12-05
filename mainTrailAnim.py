@@ -28,7 +28,7 @@ def run_simulation(max_steps, x, y, theta, SA, SO, trailmap, mapsize, foodmap, R
             p_fig, axs = trail_plot_initialization(steps_to_plot)
             max_steps = steps_to_plot[-1] + 1
 
-        canvas_trail, canvas_img, palette = trail_animation_initialization(trailmap, tk, "viridis")
+        canvas_trail, canvas_img, palette = trail_animation_initialization(trailmap, tk, "magma")
 
     for step in range(max_steps):
 
@@ -49,7 +49,7 @@ def run_simulation(max_steps, x, y, theta, SA, SO, trailmap, mapsize, foodmap, R
                 combined_map = np.maximum(trailmap, foodmap)
             else:
                 combined_map = trailmap
-            trail_img = store_trail_animation(step, combined_map, canvas_trail, canvas_img, palette)
+            trail_img = store_trail_animation(step, combined_map, palette)
             trail_imgs.append(trail_img)
         if steps_to_plot != []:
             plot_trailmap(steps_to_plot, trailmap, step, axs)
