@@ -43,7 +43,7 @@ def run_simulation(max_steps, x, y, theta, SA, SO, trailmap, mapsize, foodmap, R
                 combined_map = np.maximum(trailmap, foodmap)
             else:
                 combined_map = trailmap
-            trail_update_animation(step, combined_map, canvas_trail, canvas_img, tk, palette)
+            trail_update_animation(step, max_steps, combined_map, canvas_trail, canvas_img, tk, palette)
         if save_animation:
             if show_food:
                 combined_map = np.maximum(trailmap, foodmap)
@@ -63,9 +63,9 @@ def run_simulation(max_steps, x, y, theta, SA, SO, trailmap, mapsize, foodmap, R
 
 def main():
     # Initialization
-    max_steps = 300  # Number of steps to run simulation
+    max_steps = 1000  # Number of steps to run simulation
     mapsize = 200  # Dimension of the squared arena.
-    percent_p = 5  # Population as percentage of image area
+    percent_p = 10  # Population as percentage of image area
     N_part = int(mapsize * mapsize * percent_p / 100)  # Number of particles.
 
     SS = 1  # Step size (how far agent moves per step)
@@ -78,7 +78,7 @@ def main():
 
     depT = 5  # Chemoattractant deposition per step
 
-    bc_type = 'periodic'  # What type of boundary conditions to use (reflective or periodic)
+    bc_type = 'reflective'  # What type of boundary conditions to use (reflective or periodic)
 
     # np.random.seed(2) # Seed for random starting position
 
@@ -91,26 +91,22 @@ def main():
 
     # Maps
     trailmap = np.zeros([mapsize, mapsize])  # Empty trailmap
-    foodmap = np.zeros([mapsize, mapsize])  # Empty foodmap
 
-    food_val = 10
-    # foodmap[30:40, 30:40] = food_val
-    # foodmap[180:190, 20:30] = food_val
-    foodmap[80:90, 70:80] = food_val
-    foodmap[80:90, 150:160] = food_val
-    foodmap[40:50, 140:150] = food_val
-    foodmap[140:150, 180:190] = food_val
-    # foodmap[70:80, 120:130] = food_val
-    # foodmap[70:80, 70:80] = food_val
-    # foodmap[120:130, 70:80] = food_val
-    # foodmap[120:130, 120:130] = food_val
+    food_str = 1000
+    std = 4
+    mode = 'square' # Options on how to place food: 'none', 'random', 'manual', 'square', 'triangle'. Different modes require different inputs, see function description for more info
+    coords = [[50, 50], [140, 30], [80, 160], [20, 90]] # Example of input to 'manual'
+    width = 60 # Example of input to 'square' or 'triangle'
+    mode_input = 5
+    # mode_input = coords
+    mode_input = width
+
+    foodmap = place_food_auto(food_str, std, mapsize, mode, mode_input)
 
 
     show_animation_on = True
-    save_animation = True
-    # For trail animation (way faster than agent animation). Also possible to save
+    save_animation = False
     show_food = True # Shows food on trailmap but makes it harder to see trails
-    save_trail_animation = False  # True will save the animation at end of run
     trail_animation_name = 'FFR120-Project/animations/trails_test.gif'  # name and path of saved animation (has to be .gif). Make sure to use a path that works for you.
 
     # For trail plots
