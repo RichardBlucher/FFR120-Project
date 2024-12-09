@@ -9,7 +9,7 @@ TODO list in functions.py (list is not in any way ordered by priority)
 '''
 
 
-def run_simulation(max_steps, x, y, theta, SA, SO, trailmap, mapsize, foodmap, RA, SS, decayT, show_animation_on, save_animation, show_food,
+def run_simulation(max_steps, N_part, SA, SO, trailmap, mapsize, foodmap, RA, SS, decayT, show_animation_on, save_animation, show_food,
                    bc_type, depT, steps_to_plot):
     '''
     Function that runs the simulation
@@ -24,16 +24,18 @@ def run_simulation(max_steps, x, y, theta, SA, SO, trailmap, mapsize, foodmap, R
         tk = Tk()
         tk.geometry(f'{window_size + 20}x{window_size + 20}')
         tk.configure(background='#000000')
-        if steps_to_plot != []:
+        
+
+        canvas_trail, canvas_img, palette = trail_animation_initialization(trailmap, tk, "magma")
+    if steps_to_plot != []:
             p_fig, axs = trail_plot_initialization(steps_to_plot)
             max_steps = steps_to_plot[-1] + 1
 
-        canvas_trail, canvas_img, palette = trail_animation_initialization(trailmap, tk, "magma")
-
+    x, y, theta = initialize_positions(mapsize, N_part)
     for step in range(max_steps):
 
         theta += sense(x, y, theta, SA, SO, trailmap, mapsize, foodmap, RA, bc_type)
-        x, y = move(theta, x, y, SS)
+        x, y, theta = move(theta, x, y, SS)
         x, y, theta = boundary_conditions(x, y, theta, mapsize, bc_type)
         trailmap = deposit(x, y, trailmap, depT)
         trailmap = diffuse(trailmap)
@@ -63,9 +65,9 @@ def run_simulation(max_steps, x, y, theta, SA, SO, trailmap, mapsize, foodmap, R
 
 def main():
     # Initialization
-    max_steps = 300  # Number of steps to run simulation
+    max_steps = 1000  # Number of steps to run simulation
     mapsize = 200  # Dimension of the squared arena.
-    percent_p = 5  # Population as percentage of image area
+    percent_p = 3  # Population as percentage of image area
     N_part = int(mapsize * mapsize * percent_p / 100)  # Number of particles.
 
     SS = 1  # Step size (how far agent moves per step)
@@ -82,12 +84,9 @@ def main():
 
     # np.random.seed(2) # Seed for random starting position
 
-    # Random position.
-    x = (np.random.rand(N_part)) * mapsize
-    y = (np.random.rand(N_part)) * mapsize
+    
 
-    # Random orientation.
-    theta = 2 * (np.random.rand(N_part) - 0.5) * np.pi  # in [-pi, pi]
+    
 
     # Maps
     trailmap = np.zeros([mapsize, mapsize])  # Empty trailmap
@@ -107,9 +106,9 @@ def main():
 
 
     show_animation_on = True
-    save_animation = True
+    save_animation = False
     # For trail animation (way faster than agent animation). Also possible to save
-    show_food = True # Shows food on trailmap but makes it harder to see trails
+    show_food = False # Shows food on trailmap but makes it harder to see trails
     save_trail_animation = False  # True will save the animation at end of run
     trail_animation_name = 'FFR120-Project/animations/trails_test.gif'  # name and path of saved animation (has to be .gif). Make sure to use a path that works for you.
 
@@ -119,7 +118,7 @@ def main():
     # steps_to_plot = [1000, 2000, 4000, 6000, 8000, 10000, 12000, 15000]
     steps_to_plot = []
 
-    run_simulation(max_steps, x, y, theta, SA, SO, trailmap, mapsize, foodmap, RA, SS, decayT, show_animation_on, save_animation, show_food,
+    run_simulation(max_steps, N_part, SA, SO, trailmap, mapsize, foodmap, RA, SS, decayT, show_animation_on, save_animation, show_food,
                    bc_type, depT, steps_to_plot)
 
 if __name__ == "__main__":
