@@ -65,10 +65,9 @@ def run_simulation(max_steps, N_part, SA, SO, trailmap, mapsize, foodmap, RA, SS
 
 def main():
     # Initialization
-    max_steps = 1000  # Number of steps to run simulation
-    max_steps = 1000  # Number of steps to run simulation
+    max_steps = 10000  # Number of steps to run simulation
     mapsize = 200  # Dimension of the squared arena.
-    percent_p = 3  # Population as percentage of image area
+    percent_p = 2  # Population as percentage of image area
     N_part = int(mapsize * mapsize * percent_p / 100)  # Number of particles.
 
     SS = 1  # Step size (how far agent moves per step)
@@ -83,7 +82,7 @@ def main():
 
     bc_type = 'reflective'  # What type of boundary conditions to use (reflective or periodic)
 
-    # np.random.seed(2) # Seed for random starting position
+    np.random.seed(0) # Seed for random starting position
 
     
 
@@ -94,8 +93,8 @@ def main():
 
     food_str = 1000
     std = 4
-    mode = 'square' # Options on how to place food: 'none', 'random', 'manual', 'square', 'triangle'. Different modes require different inputs, see function description for more info
-    coords = [[50, 50], [140, 30], [80, 160], [20, 90]] # Example of input to 'manual'
+    mode = 'triangle' # Options on how to place food: 'none', 'random', 'manual', 'square', 'triangle'. Different modes require different inputs, see function description for more info
+    coords = [[150, 150], [140, 30], [80, 160], [120, 90]] # Example of input to 'manual'
     width = 60 # Example of input to 'square' or 'triangle'
     mode_input = 5
     # mode_input = coords
@@ -107,7 +106,7 @@ def main():
     show_animation_on = True
     save_animation = False
     # For trail animation (way faster than agent animation). Also possible to save
-    show_food = False # Shows food on trailmap but makes it harder to see trails
+    show_food = True # Shows food on trailmap but makes it harder to see trails
     save_trail_animation = False  # True will save the animation at end of run
     trail_animation_name = 'FFR120-Project/animations/trails_test.gif'  # name and path of saved animation (has to be .gif). Make sure to use a path that works for you.
 

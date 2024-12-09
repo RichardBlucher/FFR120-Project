@@ -136,8 +136,7 @@ def move(theta, x, y, SS):
     ny = y + SS * np.sin(theta)
     same_pos_index = [0]
     tries = 0
-    while len(same_pos_index) != 0 and tries < 3: # The "< 3" should not be needed here but sometimes it gets stuck with two particles in the same spot so i cheated a bit but will try to fix
-        #print(same_pos_index)
+    while len(same_pos_index) != 0 and tries < 10: # The "< 3" should not be needed here but sometimes it gets stuck with two particles in the same spot so i cheated a bit but will try to fix
         nxint = np.round(nx)
         nyint = np.round(ny)
 
@@ -150,7 +149,8 @@ def move(theta, x, y, SS):
         ny[same_pos_index] = y[same_pos_index]
         theta[same_pos_index] = 2 * (np.random.rand(len(same_pos_index)) - 0.5) * np.pi
         tries += 1
-    
+    print(same_pos_index)
+
 
 
 
@@ -172,8 +172,8 @@ def initialize_positions(mapsize, N_part):
 
     TODO: This function should initialize the positions in a circle and we shuld be able to giv it the center and radius.
     '''
-    x = (np.random.rand(N_part)) * mapsize
-    y = (np.random.rand(N_part)) * mapsize
+    x = (np.random.rand(N_part)) * mapsize * 0.6 + mapsize*0.2
+    y = (np.random.rand(N_part)) * mapsize * 0.6 + mapsize*0.2
     same_pos_index = [0]
     while len(same_pos_index) != 0:
         
@@ -183,8 +183,8 @@ def initialize_positions(mapsize, N_part):
         
         dist = scipy.spatial.distance.cdist(pos, pos) + np.eye(N_part)
         same_pos_index = np.where(dist == 0)[0]
-        x[same_pos_index] = (np.random.rand(len(same_pos_index))) * mapsize
-        y[same_pos_index] = (np.random.rand(len(same_pos_index))) * mapsize
+        x[same_pos_index] = (np.random.rand(len(same_pos_index))) * mapsize * 0.6 + mapsize*0.2
+        y[same_pos_index] = (np.random.rand(len(same_pos_index))) * mapsize * 0.6 + mapsize*0.2
 
 
     theta = 2 * (np.random.rand(N_part) - 0.5) * np.pi  # in [-pi, pi]
@@ -293,7 +293,20 @@ def place_food_auto(food_str, std, mapsize, mode, mode_input):
             foodmap[food_positions[:, 0], food_positions[:, 1]] = food_str
         except:
             print('No food, enter a int value for width')
+    if mode == 'dipper':
+        # I know this is ugly, i just did it for fun
+            
+        star1 = np.round(np.array([0.077, 0.161])*mapsize*0.8 + 0.1*mapsize).astype(int)
+        star2 = np.round(np.array([0.333, 0.221])*mapsize*0.8 + 0.1*mapsize).astype(int)
+        star3 = np.round(np.array([0.440, 0.352])*mapsize*0.8 + 0.1*mapsize).astype(int)
+        star4 = np.round(np.array([0.585, 0.509])*mapsize*0.8 + 0.1*mapsize).astype(int)
+        star5 = np.round(np.array([0.553, 0.680])*mapsize*0.8 + 0.1*mapsize).astype(int)
+        star6 = np.round(np.array([0.833, 0.809])*mapsize*0.8 + 0.1*mapsize).astype(int)
+        star7 = np.round(np.array([0.956, 0.640])*mapsize*0.8 + 0.1*mapsize).astype(int)
 
+        food_positions = np.flip(np.array([star1, star2, star3, star4, star5, star6, star7]))
+        foodmap[food_positions[:, 0], food_positions[:, 1]] = food_str
+        
     if mode not in ['none', 'random', 'manual', 'square', 'triangle']:
         print('No food, incorrect mode')
 
