@@ -1,3 +1,5 @@
+import random
+
 import numpy as np
 import scipy
 from matplotlib import pyplot as plt
@@ -101,7 +103,6 @@ def diffuse(trailmap):
     '''
     return scipy.ndimage.uniform_filter(trailmap)
 
-
 def decay(trailmap, decayT):
     '''
     Function to decay trails
@@ -116,7 +117,6 @@ def decay(trailmap, decayT):
     trailmap = trailmap * (1 - decayT)
 
     return trailmap
-
 
 def move(theta, x, y, SS):
     '''
@@ -240,6 +240,67 @@ def boundary_conditions(x, y, theta, mapsize, bc_type):
 
     return x, y, theta
 
+def place_food_auto(food_str, std, mapsize, mode, mode_input):
+
+    '''
+    Places food based on inputs
+
+    Input:
+    food_str - int for value of food
+    std - Standard deviation for gaussian of food
+    mapsize - int, side length of environment box
+    mode - string, how to place food - 'none', 'random', 'manual', 'square', 'triangle'
+    mode_input - int or list depending on mode, 'random':int (number of random foods), 'manual':list(coordinates for food), 'square' or 'triangle':int(length of width)
+
+    Output:
+    foodmap - np.array of size (mapsize, mapsize), map for food with gaussian dist for each point
+    '''
+
+
+    foodmap = np.zeros([mapsize, mapsize])  # Empty foodmap
+
+    if mode == 'none':
+        pass
+    if mode == 'random':
+        try:
+            food_positions = np.random.randint(10, mapsize-10, size=(2, mode_input))
+            foodmap[food_positions[0, :], food_positions[1, :]] = food_str
+        except:
+            print('No food, enter a int value for number of random foods')
+    if mode == 'manual':
+        try:
+            food_positions = np.array(mode_input)
+            foodmap[food_positions[:, 0], food_positions[:, 1]] = food_str
+        except:
+            print('No food, enter a list of coordinates')
+    if mode == 'square':
+        try:
+            width = mode_input
+            p1 = (mapsize - width) // 2
+            p2 = (mapsize - width) // 2 + width
+            food_positions = np.array([[p1, p1], [p1 , p2], [p2, p1], [p2, p2]])
+            foodmap[food_positions[:, 0], food_positions[:, 1]] = food_str
+        except:
+            print('No food, enter a int value for width')
+    if mode == 'triangle':
+        try:
+            width = mode_input
+            dc = width * np.sin(np.pi/3) // 2
+            p1 = int(mapsize // 2 - dc)
+            p2 = mapsize // 2
+            p3 = int(mapsize // 2 + dc)
+            food_positions = np.array([[p1, p2], [p3, p1], [p3, p3]])
+            foodmap[food_positions[:, 0], food_positions[:, 1]] = food_str
+        except:
+            print('No food, enter a int value for width')
+
+    if mode not in ['none', 'random', 'manual', 'square', 'triangle']:
+        print('No food, incorrect mode')
+
+    foodmap = scipy.ndimage.gaussian_filter(foodmap, std)
+
+    return foodmap
+
 def trail_animation_initialization(trailmap, tk, colormap_name):
     """
     Initializes the tkinter Canvas and image for trailmap animation.
@@ -280,7 +341,7 @@ def trail_animation_initialization(trailmap, tk, colormap_name):
 
     return canvas, canvas_img, palette
 
-def trail_update_animation(step, combined_map, canvas, canvas_img, tk_trail, palette):
+def trail_update_animation(step, max_steps, combined_map, canvas, canvas_img, tk_trail, palette):
     """
     Updates the trailmap image on the trail canvas.
 
@@ -309,7 +370,7 @@ def trail_update_animation(step, combined_map, canvas, canvas_img, tk_trail, pal
 
 
     tk_trail.update()
-    tk_trail.title(f'Iteration {step}')
+    tk_trail.title(f'Iteration {step} of {max_steps}')
 
 def store_trail_animation(step, combined_map, palette):
     """
