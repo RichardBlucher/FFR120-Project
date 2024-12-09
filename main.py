@@ -8,7 +8,7 @@ import matplotlib.animation as animation
 TODO list in functions.py (list is not in any way ordered by priority)
 '''
 
-def run_simulation(max_steps, x, y, theta, SA, SO, trailmap, mapsize, foodmap, RA, SS, decayT, animate_agents, N_skip, bc_type, depT, 
+def run_simulation(max_steps, N_part, SA, SO, trailmap, mapsize, foodmap, RA, SS, decayT, animate_agents, N_skip, bc_type, depT, 
                    animate_trails, show_trail_animation, save_trail_animation, trail_animation_name, steps_to_plot):
     '''
     Function that runs the simulation
@@ -26,10 +26,11 @@ def run_simulation(max_steps, x, y, theta, SA, SO, trailmap, mapsize, foodmap, R
     if animate_trails:
         a_fig, ax, ims = trail_animation_initialization()
 
+    x, y, theta = initialize_positions(mapsize, N_part)
     for step in range(max_steps):
-        
+        #print(f'step: {step}')
         theta += sense(x, y, theta, SA, SO, trailmap, mapsize, foodmap, RA, bc_type)
-        x, y = move(theta, x, y, SS)
+        x, y , theta = move(theta, x, y, SS)
         x, y, theta = boundary_conditions(x, y, theta, mapsize, bc_type)
         trailmap = deposit(x, y, trailmap, depT)
         trailmap = diffuse(trailmap)
@@ -53,7 +54,7 @@ def run_simulation(max_steps, x, y, theta, SA, SO, trailmap, mapsize, foodmap, R
 def main():
     
     # Initialization
-    max_steps = 4151 # Number of steps to run simulation
+    max_steps = 5000 # Number of steps to run simulation
     mapsize = 200  # Dimension of the squared arena.
     percent_p = 15 # Population as percentage of image area
     N_part = int(mapsize*mapsize * percent_p/100)   # Number of particles.
@@ -74,12 +75,7 @@ def main():
 
     np.random.seed(5) # Seed for random starting position
 
-    # Random position.
-    x = (np.random.rand(N_part)) * mapsize
-    y = (np.random.rand(N_part)) * mapsize
-
-    # Random orientation.
-    theta = 2 * (np.random.rand(N_part) - 0.5) * np.pi  # in [-pi, pi]
+    
 
     # Maps
     trailmap = np.zeros([mapsize,mapsize]) # Empty trailmap
@@ -91,9 +87,7 @@ def main():
     foodmap[130, 70] = 100
     for i in range(5):
         foodmap = diffuse(foodmap)
-    trailmap = deposit(x,y,trailmap,depT)
-    trailmap = diffuse(trailmap)
-    trailmap = decay(trailmap, decayT)
+    
 
     #print(np.max(foodmap))
     #plt.imshow(foodmap)
@@ -107,20 +101,20 @@ def main():
     N_skip = 1 # Number of steps to skip before animating a new frame
 
     # For trail animation (way faster than agent animation). Also possible to save
-    animate_trails = True # True to animate trails, False to not
+    animate_trails = False # True to animate trails, False to not
     show_trail_animation = False # True will show the animation at end of run
-    save_trail_animation = True # True will save the animation at end of run
-    trail_animation_name = 'FFR120-Project/animations/fig4.gif' # name and path of saved animation (has to be .gif). Make sure to use a path that works for you.
+    save_trail_animation = False # True will save the animation at end of run
+    trail_animation_name = 'FFR120-Project/animations/foodSquareCollisions.gif' # name and path of saved animation (has to be .gif). Make sure to use a path that works for you.
 
     # For trail plots
-    steps_to_plot = [] #[2, 22, 99, 175, 367, 512, 1740, 4151] # list with times to plot. If you don't want to plot, make steps_to_plot = [] 
+    steps_to_plot = [2, 22, 99, 175, 367, 512, 1740, 4151]#[2, 22, 99, 175, 367, 512, 1740, 4151] # list with times to plot. If you don't want to plot, make steps_to_plot = [] 
 
     
     
 
 
 
-    run_simulation(max_steps, x, y, theta, SA, SO, trailmap, mapsize, foodmap, RA, SS, decayT, animate_agents, N_skip, bc_type, depT, 
+    run_simulation(max_steps, N_part, SA, SO, trailmap, mapsize, foodmap, RA, SS, decayT, animate_agents, N_skip, bc_type, depT, 
                    animate_trails, show_trail_animation, save_trail_animation, trail_animation_name, steps_to_plot)
     
 

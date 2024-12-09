@@ -129,10 +129,31 @@ def move(theta, x, y, SS):
     x - np.array(N_particles), all particles new x position
     ny - np.array(N_particles), all particles new y position
     '''
-    x = x + SS * np.cos(theta)
+    N_part = len(x)
+    nx = x + SS * np.cos(theta)
     ny = y + SS * np.sin(theta)
+    same_pos_index = [0]
+    tries = 0
+    while len(same_pos_index) != 0 and tries < 3: # The "< 3" should not be needed here but sometimes it gets stuck with two particles in the same spot so i cheated a bit but will try to fix
+        #print(same_pos_index)
+        nxint = np.round(nx)
+        nyint = np.round(ny)
 
-    return x, ny
+        npos = np.vstack([nxint, nyint]).T
+            
+        dist = scipy.spatial.distance.cdist(npos, npos) + np.eye(N_part)
+        same_pos_index = np.where(dist == 0)[0]
+
+        nx[same_pos_index] = x[same_pos_index]
+        ny[same_pos_index] = y[same_pos_index]
+        theta[same_pos_index] = 2 * (np.random.rand(len(same_pos_index)) - 0.5) * np.pi
+        tries += 1
+    
+
+
+
+
+    return nx, ny, theta
 
 def boundary_conditions(x, y, theta, mapsize, bc_type):
     '''
@@ -182,6 +203,39 @@ def boundary_conditions(x, y, theta, mapsize, bc_type):
     else:
         print(f'You\'ve typed {bc_type} as bc_type. Please choose reflective or periodic.')
     
+    return x, y, theta
+
+def initialize_positions(mapsize, N_part):
+    '''
+    Function for initializing the positions and orientations of the agents.
+
+    Input:
+    mapsize - int, side length of environment box
+    N_part - int, number of agents.
+
+    Output:
+    x - np.array(N_particles), all particles x position
+    y - np.array(N_particles), all particles y position
+    theta - np.array(N_particles), all particles direction of travel
+
+    TODO: This function should initialize the positions in a circle and we shuld be able to giv it the center and radius.
+    '''
+    x = (np.random.rand(N_part)) * mapsize
+    y = (np.random.rand(N_part)) * mapsize
+    same_pos_index = [0]
+    while len(same_pos_index) != 0:
+        
+        xint = np.round(x)
+        yint = np.round(y)
+        pos = np.vstack([xint, yint]).T
+        
+        dist = scipy.spatial.distance.cdist(pos, pos) + np.eye(N_part)
+        same_pos_index = np.where(dist == 0)[0]
+        x[same_pos_index] = (np.random.rand(len(same_pos_index))) * mapsize
+        y[same_pos_index] = (np.random.rand(len(same_pos_index))) * mapsize
+
+
+    theta = 2 * (np.random.rand(N_part) - 0.5) * np.pi  # in [-pi, pi]
     return x, y, theta
 
 def agent_animation_initialization(x, y, theta, mapsize):
@@ -386,6 +440,7 @@ def plot_trailmap(steps_to_plot, trailmap, step, axs):
     none
     '''
     if step in steps_to_plot:
+        print(step)
         axs[steps_to_plot.index(step)].imshow(trailmap)
     if step == steps_to_plot[-1]:
         plt.show()
