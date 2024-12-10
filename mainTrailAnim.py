@@ -30,6 +30,8 @@ def run_simulation(max_steps, N_part, SA, SO, trailmap, mapsize, foodmap, RA, SS
     if steps_to_plot != []:
             p_fig, axs = trail_plot_initialization(steps_to_plot)
             max_steps = steps_to_plot[-1] + 1
+            lengths = []
+            
 
     x, y, theta = initialize_positions(mapsize, N_part)
     for step in range(max_steps):
@@ -55,6 +57,7 @@ def run_simulation(max_steps, N_part, SA, SO, trailmap, mapsize, foodmap, RA, SS
             trail_imgs.append(trail_img)
         if steps_to_plot != []:
             plot_trailmap(steps_to_plot, trailmap, step, axs)
+            lengths = plot_total_length(max_steps,trailmap,step,lengths)
 
     if save_animation:
         save_trail_animation(trail_imgs, "test_anim.mp4")
@@ -82,7 +85,7 @@ def main():
 
     bc_type = 'reflective'  # What type of boundary conditions to use (reflective or periodic)
 
-    np.random.seed(0) # Seed for random starting position
+    np.random.seed(1337) # Seed for random starting position
 
     
 
@@ -112,7 +115,7 @@ def main():
 
     # For trail plots
     # steps_to_plot = [50, 100, 150, 200]  # list with times to plot. If you don't want to plot, make steps_to_plot = []
-    # steps_to_plot = [100, 200, 300, 400, 500]
+    # steps_to_plot = [2, 22, 99, 175, 367, 512, 1740, 4151]
     # steps_to_plot = [1000, 2000, 4000, 6000, 8000, 10000, 12000, 15000]
     steps_to_plot = []
 

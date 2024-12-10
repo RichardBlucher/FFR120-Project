@@ -136,7 +136,7 @@ def move(theta, x, y, SS):
     ny = y + SS * np.sin(theta)
     same_pos_index = [0]
     tries = 0
-    while len(same_pos_index) != 0 and tries < 10: # The "< 3" should not be needed here but sometimes it gets stuck with two particles in the same spot so i cheated a bit but will try to fix
+    while len(same_pos_index) != 0 and tries < 3: # The "< 3" should not be needed here but sometimes it gets stuck with two particles in the same spot so i cheated a bit but will try to fix
         nxint = np.round(nx)
         nyint = np.round(ny)
 
@@ -149,7 +149,7 @@ def move(theta, x, y, SS):
         ny[same_pos_index] = y[same_pos_index]
         theta[same_pos_index] = 2 * (np.random.rand(len(same_pos_index)) - 0.5) * np.pi
         tries += 1
-    print(same_pos_index)
+    #print(same_pos_index) # Really useful print to check collisions
 
 
 
@@ -469,9 +469,41 @@ def plot_trailmap(steps_to_plot, trailmap, step, axs):
     none
     '''
     if step in steps_to_plot:
+        print(step)
         axs[steps_to_plot.index(step)].imshow(trailmap)
     if step == steps_to_plot[-1]:
         plt.show()
+
+
+def plot_total_length(max_steps, trailmap, step, lengths):
+    '''
+    Idea for something similar to the total lenght (or cost in Tokyo paper)
+
+    Inputs:
+    max_steps - int, nr of steps the simulation runs for
+    trailmap - np.array(mapsize, mapsize), matrix with trail values
+    step - int, current step (iteration) of the simulation
+    axs - list of Axes objects, for making the trail plots
+
+    Output:
+    none
+    '''
+
+    
+    
+
+
+    
+    high_trail = trailmap > 2
+    lengths.append(np.sum(high_trail)*100/(trailmap.shape[0]**2))
+    
+    if step == max_steps-1:
+        plt.plot(lengths)
+        plt.xlabel('Step')
+        plt.ylabel('% of map containing trail')
+        plt.show()
+
+    return lengths
 
 
 '''
