@@ -165,7 +165,7 @@ def initialize_positions(mapsize, N_part, radius, position):
     mapsize - int, side length of environment box
     N_part - int, number of agents.
     radius - radius of spawn circle
-    position - list, center of circle
+    position - list, center of circle, enter 'c' for center of map
 
     Output:
     x - np.array(N_particles), all particles x position
@@ -174,7 +174,11 @@ def initialize_positions(mapsize, N_part, radius, position):
 
     '''
 
-    x_c, y_c = position
+
+    if position == "c":
+        x_c, y_c = mapsize//2, mapsize//2
+    else:
+        x_c, y_c = position
 
     # Setting min radius for collisions
     min_radius = int(np.sqrt(N_part / np.pi) * 1.5)
