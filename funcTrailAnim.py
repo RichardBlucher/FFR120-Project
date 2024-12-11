@@ -478,13 +478,13 @@ def trail_plot_initialization(steps_to_plot):
     axs - list of Axes objects, for making the trail plots
     '''
     nr_of_plots = len(steps_to_plot)
-    fig, axs = plt.subplots(nrows=1, ncols=nr_of_plots, figsize=(nr_of_plots*3, 3), layout='constrained')
+    fig, axs = plt.subplots(nrows=1, ncols=nr_of_plots, figsize=(nr_of_plots*3, 3), layout='constrained', facecolor='#E7E9E7')
     #fig.suptitle('Configuration of the system at different t')
     i_fig = 0
     for step in steps_to_plot:
         axs[i_fig].set_title(f't = {step}')
-        axs[i_fig].set_xlabel('x')
-        axs[i_fig].set_ylabel('y')
+        axs[i_fig].set_xticks([])
+        axs[i_fig].set_yticks([])
         i_fig += 1
     
     return fig, axs
@@ -505,6 +505,7 @@ def plot_trailmap(steps_to_plot, trailmap, step, axs):
     if step in steps_to_plot:
         print(step)
         axs[steps_to_plot.index(step)].imshow(trailmap)
+        
     if step == steps_to_plot[-1]:
         plt.show()
 
@@ -532,9 +533,10 @@ def plot_total_length(max_steps, trailmap, step, lengths):
     lengths.append(np.sum(high_trail)*100/(trailmap.shape[0]**2))
     
     if step == max_steps-1:
+        plt.figure(facecolor='#E7E9E7')
         plt.plot(lengths)
         plt.xlabel('Step')
-        plt.ylabel('% of map containing trail')
+        plt.ylabel('Area of map covered in trails [%]')
         plt.show()
 
     return lengths
