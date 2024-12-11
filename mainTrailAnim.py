@@ -33,7 +33,7 @@ def run_simulation(max_steps, N_part, SA, SO, trailmap, mapsize, foodmap, RA, SS
             lengths = []
             
 
-    x, y, theta = initialize_positions(mapsize, N_part)
+    x, y, theta = initialize_positions(mapsize, N_part, 80, [100, 100])
     for step in range(max_steps):
 
         theta += sense(x, y, theta, SA, SO, trailmap, mapsize, foodmap, RA, bc_type)
@@ -94,7 +94,7 @@ def main():
     # Maps
     trailmap = np.zeros([mapsize, mapsize])  # Empty trailmap
 
-    food_str = 1000
+    food_str = 10
     std = 4
     mode = 'triangle' # Options on how to place food: 'none', 'random', 'manual', 'square', 'triangle'. Different modes require different inputs, see function description for more info
     coords = [[150, 150], [140, 30], [80, 160], [120, 90]] # Example of input to 'manual'
@@ -103,8 +103,7 @@ def main():
     # mode_input = coords
     mode_input = width
 
-    foodmap = place_food_auto(food_str, std, mapsize, mode, mode_input)
-
+    foodmap = place_food(food_str, std, mapsize, mode, mode_input)
 
     show_animation_on = True
     save_animation = False

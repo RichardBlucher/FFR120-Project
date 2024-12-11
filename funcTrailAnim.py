@@ -157,37 +157,63 @@ def move(theta, x, y, SS):
 
     return nx, ny, theta
 
-def initialize_positions(mapsize, N_part):
+def initialize_positions(mapsize, N_part, radius, position):
     '''
     Function for initializing the positions and orientations of the agents.
 
     Input:
     mapsize - int, side length of environment box
     N_part - int, number of agents.
+    radius - radius of spawn circle
+    position - list, center of circle
 
     Output:
     x - np.array(N_particles), all particles x position
     y - np.array(N_particles), all particles y position
     theta - np.array(N_particles), all particles direction of travel
 
-    TODO: This function should initialize the positions in a circle and we shuld be able to giv it the center and radius.
     '''
-    x = (np.random.rand(N_part)) * mapsize * 0.6 + mapsize*0.2
-    y = (np.random.rand(N_part)) * mapsize * 0.6 + mapsize*0.2
+
+    x_c, y_c = position
+
+    # Setting min radius for collisions
+    min_radius = int(np.sqrt(N_part / np.pi) * 1.5)
+    if radius < min_radius:
+        print(f'Too small radius, setting radius to {min_radius}.')
+        radius = min_radius
+
+    # If circle out of bounds adjust position
+    if x_c + radius > mapsize:
+        x_c = mapsize - radius - 5
+    if x_c - radius > mapsize:
+        x_c = mapsize + radius + 5
+    if y_c + radius > mapsize:
+        y_c = mapsize - radius - 5
+    if y_c - radius > mapsize:
+        y_c = mapsize + radius + 5
+
+    r = np.sqrt(np.random.rand(N_part)) * radius
+    angle = np.random.rand(N_part) * 2 * np.pi
+
+    x = x_c + r * np.cos(angle)
+    y = y_c + r * np.sin(angle)
+
     same_pos_index = [0]
     while len(same_pos_index) != 0:
-        
         xint = np.round(x)
         yint = np.round(y)
         pos = np.vstack([xint, yint]).T
-        
+
         dist = scipy.spatial.distance.cdist(pos, pos) + np.eye(N_part)
         same_pos_index = np.where(dist == 0)[0]
-        x[same_pos_index] = (np.random.rand(len(same_pos_index))) * mapsize * 0.6 + mapsize*0.2
-        y[same_pos_index] = (np.random.rand(len(same_pos_index))) * mapsize * 0.6 + mapsize*0.2
 
+        r = np.sqrt(np.random.rand(len(same_pos_index))) * radius
+        angle = np.random.rand(len(same_pos_index)) * 2 * np.pi
+        x[same_pos_index] = x_c + r * np.cos(angle)
+        y[same_pos_index] = y_c + r * np.sin(angle)
 
     theta = 2 * (np.random.rand(N_part) - 0.5) * np.pi  # in [-pi, pi]
+
     return x, y, theta
 
 def boundary_conditions(x, y, theta, mapsize, bc_type):
@@ -240,7 +266,7 @@ def boundary_conditions(x, y, theta, mapsize, bc_type):
 
     return x, y, theta
 
-def place_food_auto(food_str, std, mapsize, mode, mode_input):
+def place_food(food_str, std, mapsize, mode, mode_input):
 
     '''
     Places food based on inputs
@@ -311,6 +337,10 @@ def place_food_auto(food_str, std, mapsize, mode, mode_input):
         print('No food, incorrect mode')
 
     foodmap = scipy.ndimage.gaussian_filter(foodmap, std)
+
+    # Makes it so that value of food_str is the peak value, it's a bit wierd but it works (kinda)
+    frac = (0.0003331331 + (1992766 - 0.0003331331) / (1 + (std / 0.008938102) ** 2.000044)) / 1000
+    foodmap = foodmap / frac
 
     return foodmap
 
