@@ -33,7 +33,7 @@ def run_simulation(max_steps, N_part, SA, SO, trailmap, mapsize, foodmap, RA, SS
             lengths = []
             
 
-    x, y, theta = initialize_positions(mapsize, N_part, 60, 'c') # Position either list of coordinates or 'c' for center
+    x, y, theta = initialize_positions(mapsize, N_part, 90, 'c') # Position either list of coordinates or 'c' for center
     for step in range(max_steps):
         # print(step)
         theta += sense(x, y, theta, SA, SO, trailmap, mapsize, foodmap, RA, bc_type)
@@ -70,7 +70,7 @@ def main():
     # Initialization
     max_steps = 10000  # Number of steps to run simulation
     mapsize = 200  # Dimension of the squared arena.
-    percent_p = 2  # Population as percentage of image area
+    percent_p = 3  # Population as percentage of image area
     N_part = int(mapsize * mapsize * percent_p / 100)  # Number of particles.
 
     SS = 1  # Step size (how far agent moves per step)
@@ -95,8 +95,8 @@ def main():
     trailmap = np.zeros([mapsize, mapsize])  # Empty trailmap
 
     food_str = 10
-    std = 4
-    mode = 'square' # Options on how to place food: 'none', 'random', 'manual', 'square', 'triangle'. Different modes require different inputs, see function description for more info
+    std = 2
+    mode = 'tokyo' # Options on how to place food: 'none', 'random', 'manual', 'square', 'triangle'. Different modes require different inputs, see function description for more info
     coords = [[150, 150], [140, 30], [80, 160], [120, 90]] # Example of input to 'manual'
     width = 60 # Example of input to 'square' or 'triangle'
     mode_input = 5
@@ -105,7 +105,7 @@ def main():
 
     foodmap = place_food(food_str, std, mapsize, mode, mode_input)
 
-    show_animation_on = False
+    show_animation_on = True
     save_animation = False
     # For trail animation (way faster than agent animation). Also possible to save
     show_food = True # Shows food on trailmap but makes it harder to see trails
@@ -116,7 +116,7 @@ def main():
     # steps_to_plot = [50, 100, 150, 200]  # list with times to plot. If you don't want to plot, make steps_to_plot = []
     # steps_to_plot = [2, 22, 99, 175, 367, 512, 1740, 4151]
     # steps_to_plot = [1000, 2000, 4000, 6000, 8000, 10000, 12000, 15000]
-    steps_to_plot = [2, 100, 1000, 2000]
+    steps_to_plot = []
 
     run_simulation(max_steps, N_part, SA, SO, trailmap, mapsize, foodmap, RA, SS, decayT, show_animation_on, save_animation, show_food,
                    bc_type, depT, steps_to_plot)

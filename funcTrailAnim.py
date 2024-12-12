@@ -366,6 +366,7 @@ def place_food(food_str, std, mapsize, mode, mode_input):
         g25=np.round(np.array([0.54,	    0.923636364])*mapsize).astype(int)
 
         food_positions = np.flip(np.array([g1, g2, g3, g4, g5, g6, g7, g8, g9, g10, g11, g12, g13, g14, g15, g16, g17, g18, g19, g20, g21, g22, g23, g24, g25]))
+        food_positions = np.round(food_positions*0.8+ 0.1*mapsize).astype(int)
         foodmap[food_positions[:, 0], food_positions[:, 1]] = food_str
 
     if mode == 'tokyo':
@@ -378,7 +379,7 @@ def place_food(food_str, std, mapsize, mode, mode_input):
         t6=np.round(np.array([0.31875, 0.15375])*mapsize).astype(int)
         t7=np.round(np.array([0.45625, 0.16875])*mapsize).astype(int)
         t8=np.round(np.array([0.74375, 0.15])*mapsize).astype(int)
-        t9=np.round(np.array([0.275, 2.5])*mapsize).astype(int)
+        t9=np.round(np.array([0.275, 0.25])*mapsize).astype(int)
         t10=np.round(np.array([0.63125, 0.2875])*mapsize).astype(int)
         t11=np.round(np.array([0.3625, 0.35])*mapsize).astype(int)
         t12=np.round(np.array([0.385, 0.4])*mapsize).astype(int)
@@ -409,6 +410,7 @@ def place_food(food_str, std, mapsize, mode, mode_input):
     
 
         food_positions = np.flip(np.array([t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19, t20, t21, t22, t23, t24, t25, t26, t27, t28, t29, t30, t31, t32, t33, t34, t35]))
+        food_positions = np.round(food_positions*0.8+ 0.1*mapsize).astype(int)
         foodmap[food_positions[:, 0], food_positions[:, 1]] = food_str
 
     
