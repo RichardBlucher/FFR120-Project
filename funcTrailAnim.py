@@ -157,7 +157,7 @@ def move(theta, x, y, SS):
 
     return nx, ny, theta
 
-def initialize_positions(mapsize, N_part, mode, radius, position):
+def initialize_positions(mapsize, N_part, mode, radius, position): # boundrydict
     '''
     Function for initializing the positions and orientations of the agents.
 
@@ -208,6 +208,7 @@ def initialize_positions(mapsize, N_part, mode, radius, position):
         y = np.random.randint(5, mapsize-5, N_part)
 
     same_pos_index = [0]
+    #in_barrier_index = []
     while len(same_pos_index) != 0:
         xint = np.round(x)
         yint = np.round(y)
@@ -215,6 +216,7 @@ def initialize_positions(mapsize, N_part, mode, radius, position):
 
         dist = scipy.spatial.distance.cdist(pos, pos) + np.eye(N_part)
         same_pos_index = np.where(dist == 0)[0]
+        #in_barrier_index = [i for i in range(len(pos)) if pos[i][:] in boundrydict]
 
         if mode == "circle":
             r = np.sqrt(np.random.rand(len(same_pos_index))) * radius
@@ -224,6 +226,8 @@ def initialize_positions(mapsize, N_part, mode, radius, position):
         if mode == "square":
             x[same_pos_index] = np.random.randint(5, mapsize-5, len(same_pos_index))
             y[same_pos_index] = np.random.randint(5, mapsize-5, len(same_pos_index))
+            #x[in_barrier_index] = np.random.randint(5, mapsize-5, len(in_barrier_index))
+            #y[in_barrier_index] = np.random.randint(5, mapsize-5, len(in_barrier_index))
 
     theta = 2 * (np.random.rand(N_part) - 0.5) * np.pi  # in [-pi, pi]
 
@@ -627,7 +631,9 @@ def plot_total_length(max_steps, trailmap, step, lengths):
 
     return lengths
 
-def image_to_matrix(image_path, matrix_size=(300, 300)):
+def image_to_matrix(image_path, mapsize):
+
+    matrix_size = (mapsize, mapsize)
     
     img = cv2.imread(image_path)
 
