@@ -1,68 +1,74 @@
-import geopandas as gpd
+import cv2
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.colors as mcolors
-import rasterio
-from rasterio.features import rasterize
+from matplotlib.colors import ListedColormap
 
-# Load downloaded file from: https://geojson.io/#new&map=7.21/35.421/139.044/0/2
-geojson_path = r'C:\Users\Olle\Desktop\FFR120\Project\map3.geojson' #geojson path
-tokyo_boundary = gpd.read_file(geojson_path)
+def image_to_matrix(image_path, matrix_size=(300, 300)):
+    
+    img = cv2.imread(image_path)
 
-# Check for any invalid geometries
-print("Are geometries valid?", tokyo_boundary.is_valid.all())
+    # 550x550 before resize
+    # Resize the image to 200x200
+    img2 = cv2.resize(img, matrix_size)
 
-# Plot the boundary after reprojection
-fig, ax = plt.subplots(figsize=(10, 10))
-tokyo_boundary.plot(ax=ax, color='lightblue', edgecolor='black')
-plt.title("Tokyo Boundary")
+    # Initialize the matrix with zeros (sea)
+    matrix = np.zeros((img.shape[0], img.shape[1]))
+
+    # Iterate through the image to fill the matrix
+    for y in range(img.shape[0]):
+        for x in range(img.shape[1]):
+            # Get the pixel color (BGR format from OpenCV)
+            pixel = img[y, x]
+            
+            blue, green, red = pixel
+
+            # Check if the pixel is red (food) by detecting if red is dominant
+            if red > 200 and green < 100 and blue < 100:  # Threshold for red color
+                matrix[y, x] = 2  
+            elif red == 255 and green == 255 and blue == 255:  # white pixel (land)
+                matrix[y, x] = 1  
+            elif red == 0 and green == 0 and blue == 0:  # black pixel (sea)
+                matrix[y, x] = 0  
+
+    return matrix
+
+image_path = r"../MapRef/GothenburgCropedFood.png"  # path
+matrix = image_to_matrix(image_path)
+
+print("Matrix shape:", matrix.shape)  # should print (200, 200)
+
+
+# Check if it finds/identifies the right amount of food locations 
+def check_food(matrix):
+    
+    food_count = 0  
+    found_food = False
+  
+    for y in range(matrix.shape[0]):
+        for x in range(matrix.shape[1]):
+            if matrix[y, x] == 2:  
+                print(f"Food found at ({x}, {y})")
+                found_food = True
+                food_count += 1
+    
+    if not found_food:
+        print("No food found in the map.")
+    
+    return food_count  
+
+
+food_count = check_food(matrix)
+print(f"Total food locations found: {food_count}")
+
+
+
+# Plot and compare to original picture
+cmap = ListedColormap(['black', 'white', 'red'])
+
+plt.imshow(matrix, cmap='coolwarm', interpolation='nearest')
+plt.colorbar(label='Map Values')
+plt.title('Matrix')
 plt.show()
+    
 
-bounds = tokyo_boundary.total_bounds  # (minx, miny, maxx, maxy)
-print(f"Bounds: {bounds}")  # print bounds
 
-resolution = 0.001  # Size of each grid cell in meters ?
-
-# Ensure resolution is appropriate
-cols = int((bounds[2] - bounds[0]) / resolution)
-rows = int((bounds[3] - bounds[1]) / resolution)
-
-transform = rasterio.transform.from_bounds(*bounds, cols, rows)
-
-# Rasterize the polygons with correct handling of the interior
-geometry = [(geom, 1) for geom in tokyo_boundary.geometry]
-raster = rasterize(
-        shapes=geometry,
-        out_shape=(rows, cols),
-        transform=transform,
-        fill=0,  # Default value for cells outside the geometry
-        dtype=np.uint8,
-        all_touched=True  # Ensure all touched pixels are filled
-)
-
-cmap = plt.cm.colors.ListedColormap(['blue', 'green'])
-
-plt.imshow(raster, cmap=cmap)
-plt.title("Rasterized Map")
-plt.show()
-
-print(raster)
-print("Bounds:", bounds)
-print("Raster matrix size:", raster.shape)
-
-# Set specific cells in the raster matrix to a new value
-raster[100:140, 560:600] = 2  # Mark a 40x40 block with the value 2
-
-# Define colors for the values (0: blue, 1: green, 2: red)
-cmap = mcolors.ListedColormap(['blue', 'green', 'red'])
-bounds = [0, 1, 2, 3]  # Define boundaries for color mapping
-norm = mcolors.BoundaryNorm(bounds, cmap.N)
-
-plt.imshow(raster, cmap=cmap, norm=norm)
-plt.title("Raster Map with Custom Colors")
-plt.show()
-
-tmap = np.array(raster)
-print(tmap.shape)
-print(np.size(tmap, 0))
-print(tmap)
