@@ -33,7 +33,7 @@ def run_simulation(max_steps, N_part, SA, SO, trailmap, mapsize, foodmap, RA, SS
             lengths = []
             
 
-    x, y, theta = initialize_positions(mapsize, N_part, 90, 'c') # Position either list of coordinates or 'c' for center
+    x, y, theta = initialize_positions(mapsize, N_part, "square", 90, 'c') # Position either list of coordinates or 'c' for center
     for step in range(max_steps):
         # print(step)
         theta += sense(x, y, theta, SA, SO, trailmap, mapsize, foodmap, RA, bc_type)
