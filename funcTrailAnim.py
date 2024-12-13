@@ -157,13 +157,14 @@ def move(theta, x, y, SS):
 
     return nx, ny, theta
 
-def initialize_positions(mapsize, N_part, radius, position):
+def initialize_positions(mapsize, N_part, mode, radius, position):
     '''
     Function for initializing the positions and orientations of the agents.
 
     Input:
     mapsize - int, side length of environment box
     N_part - int, number of agents.
+    mode - either 'square' or 'circle'
     radius - radius of spawn circle
     position - list, center of circle, enter 'c' for center of map
 
@@ -174,33 +175,37 @@ def initialize_positions(mapsize, N_part, radius, position):
 
     '''
 
+    if mode == "circle":
+        if position == "c":
+            x_c, y_c = mapsize//2, mapsize//2
+        else:
+            x_c, y_c = position
 
-    if position == "c":
-        x_c, y_c = mapsize//2, mapsize//2
-    else:
-        x_c, y_c = position
+        # Setting min radius for collisions
+        min_radius = int(np.sqrt(N_part / np.pi) * 1.5)
+        if radius < min_radius:
+            print(f'Too small radius, setting radius to {min_radius}.')
+            radius = min_radius
 
-    # Setting min radius for collisions
-    min_radius = int(np.sqrt(N_part / np.pi) * 1.5)
-    if radius < min_radius:
-        print(f'Too small radius, setting radius to {min_radius}.')
-        radius = min_radius
+        # If circle out of bounds adjust position
+        if x_c + radius > mapsize:
+            x_c = mapsize - radius - 5
+        if x_c - radius > mapsize:
+            x_c = mapsize + radius + 5
+        if y_c + radius > mapsize:
+            y_c = mapsize - radius - 5
+        if y_c - radius > mapsize:
+            y_c = mapsize + radius + 5
 
-    # If circle out of bounds adjust position
-    if x_c + radius > mapsize:
-        x_c = mapsize - radius - 5
-    if x_c - radius > mapsize:
-        x_c = mapsize + radius + 5
-    if y_c + radius > mapsize:
-        y_c = mapsize - radius - 5
-    if y_c - radius > mapsize:
-        y_c = mapsize + radius + 5
+        r = np.sqrt(np.random.rand(N_part)) * radius
+        angle = np.random.rand(N_part) * 2 * np.pi
 
-    r = np.sqrt(np.random.rand(N_part)) * radius
-    angle = np.random.rand(N_part) * 2 * np.pi
+        x = x_c + r * np.cos(angle)
+        y = y_c + r * np.sin(angle)
 
-    x = x_c + r * np.cos(angle)
-    y = y_c + r * np.sin(angle)
+    if mode == "square":
+        x = np.random.randint(5, mapsize-5, N_part)
+        y = np.random.randint(5, mapsize-5, N_part)
 
     same_pos_index = [0]
     while len(same_pos_index) != 0:
@@ -211,10 +216,14 @@ def initialize_positions(mapsize, N_part, radius, position):
         dist = scipy.spatial.distance.cdist(pos, pos) + np.eye(N_part)
         same_pos_index = np.where(dist == 0)[0]
 
-        r = np.sqrt(np.random.rand(len(same_pos_index))) * radius
-        angle = np.random.rand(len(same_pos_index)) * 2 * np.pi
-        x[same_pos_index] = x_c + r * np.cos(angle)
-        y[same_pos_index] = y_c + r * np.sin(angle)
+        if mode == "circle":
+            r = np.sqrt(np.random.rand(len(same_pos_index))) * radius
+            angle = np.random.rand(len(same_pos_index)) * 2 * np.pi
+            x[same_pos_index] = x_c + r * np.cos(angle)
+            y[same_pos_index] = y_c + r * np.sin(angle)
+        if mode == "square":
+            x[same_pos_index] = np.random.randint(5, mapsize-5, len(same_pos_index))
+            y[same_pos_index] = np.random.randint(5, mapsize-5, len(same_pos_index))
 
     theta = 2 * (np.random.rand(N_part) - 0.5) * np.pi  # in [-pi, pi]
 
@@ -414,7 +423,7 @@ def place_food(food_str, std, mapsize, mode, mode_input):
         foodmap[food_positions[:, 0], food_positions[:, 1]] = food_str
 
     
-    if mode not in ['none', 'random', 'manual', 'square', 'triangle']:
+    if mode not in ['none', 'random', 'manual', 'square', 'triangle', 'dipper', 'gothenburg', 'tokyo']:
         print('No food, incorrect mode')
 
     foodmap = scipy.ndimage.gaussian_filter(foodmap, std)
