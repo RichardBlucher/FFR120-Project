@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
 
+
 def image_to_matrix(image_path, matrix_size=(300, 300)):
     
     img = cv2.imread(image_path)
@@ -12,30 +13,33 @@ def image_to_matrix(image_path, matrix_size=(300, 300)):
     img2 = cv2.resize(img, matrix_size)
 
     # Initialize the matrix with zeros (sea)
-    matrix = np.zeros((img.shape[0], img.shape[1]))
+    matrix = np.zeros((img2.shape[0], img2.shape[1]))
 
     # Iterate through the image to fill the matrix
-    for y in range(img.shape[0]):
-        for x in range(img.shape[1]):
+    for y in range(img2.shape[0]):
+        for x in range(img2.shape[1]):
             # Get the pixel color (BGR format from OpenCV)
-            pixel = img[y, x]
+            pixel = img2[y, x]
             
             blue, green, red = pixel
 
             # Check if the pixel is red (food) by detecting if red is dominant
-            if red > 200 and green < 100 and blue < 100:  # Threshold for red color
-                matrix[y, x] = 2  
-            elif red == 255 and green == 255 and blue == 255:  # white pixel (land)
-                matrix[y, x] = 1  
-            elif red == 0 and green == 0 and blue == 0:  # black pixel (sea)
-                matrix[y, x] = 0  
+            #if red > 200 and green < 100 and blue < 100:  # Threshold for red color
+                #matrix[y, x] = 2  
+            if red == 0 and green == 0 and blue == 0:  # white pixel (land)
+                matrix[y, x] = 1
+            else: # black pixel (sea)
+                matrix[y, x] = 0
 
-    return matrix
+    boundrylist = np.argwhere(matrix != 0)
+    boundrydict = {(i,j) : matrix[i][j] for i,j in boundrylist}
 
-image_path = r"../MapRef/GothenburgCropedFood.png"  # path
+    return boundrydict
+
+image_path = r"../MapRef/Tokyo.png"  # path
 matrix = image_to_matrix(image_path)
 
-print("Matrix shape:", matrix.shape)  # should print (200, 200)
+
 
 
 # Check if it finds/identifies the right amount of food locations 
@@ -57,15 +61,9 @@ def check_food(matrix):
     return food_count  
 
 
-food_count = check_food(matrix)
-print(f"Total food locations found: {food_count}")
+cmap = ListedColormap(['black', 'white'])
 
-
-
-# Plot and compare to original picture
-cmap = ListedColormap(['black', 'white', 'red'])
-
-plt.imshow(matrix, cmap='coolwarm', interpolation='nearest')
+plt.imshow(matrix, cmap=cmap, interpolation='nearest')
 plt.colorbar(label='Map Values')
 plt.title('Matrix')
 plt.show()
