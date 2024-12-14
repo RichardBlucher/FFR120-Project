@@ -615,7 +615,7 @@ def plot_total_length(max_steps, trailmap, step, lengths):
         plt.xlabel('Step')
         plt.ylabel('Area of map covered in trails [%]')
         plt.show()
-        #test
+        #np.save('FFR120-Project/AreaData/triangle_200p', lengths)
 
     return lengths
 

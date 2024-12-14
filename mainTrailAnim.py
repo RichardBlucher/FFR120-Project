@@ -33,7 +33,7 @@ def run_simulation(max_steps, N_part, SA, SO, trailmap, mapsize, foodmap, RA, SS
             lengths = []
             
 
-    x, y, theta = initialize_positions(mapsize, N_part, 90, 'c') # Position either list of coordinates or 'c' for center
+    x, y, theta = initialize_positions(mapsize, N_part, 60, 'c') # Position either list of coordinates or 'c' for center
     for step in range(max_steps):
         # print(step)
         theta += sense(x, y, theta, SA, SO, trailmap, mapsize, foodmap, RA, bc_type)
@@ -60,7 +60,7 @@ def run_simulation(max_steps, N_part, SA, SO, trailmap, mapsize, foodmap, RA, SS
             lengths = plot_total_length(max_steps,trailmap,step,lengths)
 
     if save_animation:
-        save_trail_animation(trail_imgs, "test_anim_300_square_r_90.mp4")
+        save_trail_animation(trail_imgs, "anim_no_food_200p.mp4")
 
     print(f'Time: {(timer() - start):.4}')  # Prints the time the run took
 
@@ -69,23 +69,23 @@ def run_simulation(max_steps, N_part, SA, SO, trailmap, mapsize, foodmap, RA, SS
 def main():
     # Initialization
     max_steps = 10000  # Number of steps to run simulation
-    mapsize = 300  # Dimension of the squared arena.
-    percent_p = 2  # Population as percentage of image area
+    mapsize = 200  # Dimension of the squared arena.
+    percent_p = 15  # Population as percentage of image area
     N_part = int(mapsize * mapsize * percent_p / 100)  # Number of particles.
 
     SS = 1  # Step size (how far agent moves per step)
 
     RA = np.pi / 4  # Agent rotation angle
-    SA = np.pi / 4  # Sensor angle from forward position
+    SA = np.pi / 8  # Sensor angle from forward position
     SO = 9  # Sensor offset distance
 
     decayT = 0.1  # Trail-map chemoattractant diffusion decay factor
 
     depT = 5  # Chemoattractant deposition per step
 
-    bc_type = 'reflective'  # What type of boundary conditions to use (reflective or periodic)
+    bc_type = 'periodic'  # What type of boundary conditions to use (reflective or periodic)
 
-    np.random.seed(2) # Seed for random starting position
+    np.random.seed(0) # Seed for random starting position
 
     
 
@@ -96,9 +96,9 @@ def main():
 
     food_str = 10
     std = 4
-    mode = 'square' # Options on how to place food: 'none', 'random', 'manual', 'square', 'triangle'. Different modes require different inputs, see function description for more info
+    mode = 'none' # Options on how to place food: 'none', 'random', 'manual', 'square', 'triangle'. Different modes require different inputs, see function description for more info
     coords = [[150, 150], [140, 30], [80, 160], [120, 90]] # Example of input to 'manual'
-    width = 90 # Example of input to 'square' or 'triangle'
+    width = 60 # Example of input to 'square' or 'triangle'
     mode_input = 5
     # mode_input = coords
     mode_input = width
@@ -106,17 +106,18 @@ def main():
     foodmap = place_food(food_str, std, mapsize, mode, mode_input)
 
     show_animation_on = True
-    save_animation = False
+    save_animation = True
     # For trail animation (way faster than agent animation). Also possible to save
     show_food = True # Shows food on trailmap but makes it harder to see trails
-    save_trail_animation = False  # True will save the animation at end of run
+    save_trail_animation = True  # True will save the animation at end of run
     trail_animation_name = 'FFR120-Project/animations/trails_test.gif'  # name and path of saved animation (has to be .gif). Make sure to use a path that works for you.
 
     # For trail plots
     # steps_to_plot = [50, 100, 150, 200]  # list with times to plot. If you don't want to plot, make steps_to_plot = []
     # steps_to_plot = [2, 22, 99, 175, 367, 512, 1740, 4151]
     # steps_to_plot = [1000, 2000, 4000, 6000, 8000, 10000, 12000, 15000]
-    steps_to_plot = []
+    #steps_to_plot = [2, 100, 1500, 2500]
+    steps_to_plot = [2, 22, 99, 367, 1740, 4151]
 
     run_simulation(max_steps, N_part, SA, SO, trailmap, mapsize, foodmap, RA, SS, decayT, show_animation_on, save_animation, show_food,
                    bc_type, depT, steps_to_plot)
