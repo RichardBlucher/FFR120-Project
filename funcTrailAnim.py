@@ -366,7 +366,7 @@ def place_food(food_str, std, mapsize, mode, mode_input):
         g25=np.round(np.array([0.54,	    0.923636364])*mapsize).astype(int)
 
         food_positions = np.flip(np.array([g1, g2, g3, g4, g5, g6, g7, g8, g9, g10, g11, g12, g13, g14, g15, g16, g17, g18, g19, g20, g21, g22, g23, g24, g25]))
-        food_positions = np.round(food_positions*0.8+ 0.1*mapsize).astype(int)
+        #food_positions = np.round(food_positions*0.8+ 0.1*mapsize).astype(int)
         foodmap[food_positions[:, 0], food_positions[:, 1]] = food_str
 
     if mode == 'tokyo':
@@ -559,7 +559,7 @@ def trail_plot_initialization(steps_to_plot):
     #fig.suptitle('Configuration of the system at different t')
     i_fig = 0
     for step in steps_to_plot:
-        axs[i_fig].set_title(f't = {step}')
+        #axs[i_fig].set_title(f't = {step}')
         axs[i_fig].set_xticks([])
         axs[i_fig].set_yticks([])
         i_fig += 1
@@ -615,6 +615,7 @@ def plot_total_length(max_steps, trailmap, step, lengths):
         plt.xlabel('Step')
         plt.ylabel('Area of map covered in trails [%]')
         plt.show()
+        #test
 
     return lengths
 

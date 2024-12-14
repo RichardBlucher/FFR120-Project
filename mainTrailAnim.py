@@ -60,7 +60,7 @@ def run_simulation(max_steps, N_part, SA, SO, trailmap, mapsize, foodmap, RA, SS
             lengths = plot_total_length(max_steps,trailmap,step,lengths)
 
     if save_animation:
-        save_trail_animation(trail_imgs, "test_anim.mp4")
+        save_trail_animation(trail_imgs, "test_anim_300_square_r_90.mp4")
 
     print(f'Time: {(timer() - start):.4}')  # Prints the time the run took
 
@@ -69,8 +69,8 @@ def run_simulation(max_steps, N_part, SA, SO, trailmap, mapsize, foodmap, RA, SS
 def main():
     # Initialization
     max_steps = 10000  # Number of steps to run simulation
-    mapsize = 200  # Dimension of the squared arena.
-    percent_p = 3  # Population as percentage of image area
+    mapsize = 300  # Dimension of the squared arena.
+    percent_p = 2  # Population as percentage of image area
     N_part = int(mapsize * mapsize * percent_p / 100)  # Number of particles.
 
     SS = 1  # Step size (how far agent moves per step)
@@ -95,10 +95,10 @@ def main():
     trailmap = np.zeros([mapsize, mapsize])  # Empty trailmap
 
     food_str = 10
-    std = 2
-    mode = 'tokyo' # Options on how to place food: 'none', 'random', 'manual', 'square', 'triangle'. Different modes require different inputs, see function description for more info
+    std = 4
+    mode = 'square' # Options on how to place food: 'none', 'random', 'manual', 'square', 'triangle'. Different modes require different inputs, see function description for more info
     coords = [[150, 150], [140, 30], [80, 160], [120, 90]] # Example of input to 'manual'
-    width = 60 # Example of input to 'square' or 'triangle'
+    width = 90 # Example of input to 'square' or 'triangle'
     mode_input = 5
     # mode_input = coords
     mode_input = width
