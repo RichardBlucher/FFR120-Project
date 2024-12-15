@@ -137,7 +137,7 @@ def move(theta, x, y, SS, boundrydict):
     same_pos_index = [0]
     tries = 0
     in_barrier_index = []
-    while len(same_pos_index) != 0 or len(in_barrier_index) !=0 and tries < 3: # The "< 3" should not be needed here but sometimes it gets stuck with two particles in the same spot so i cheated a bit but will try to fix
+    while len(same_pos_index) != 0 or len(in_barrier_index) !=0 and tries < 5: # The "< 3" should not be needed here but sometimes it gets stuck with two particles in the same spot so i cheated a bit but will try to fix
         nxint = np.round(nx)
         nyint = np.round(ny)
 
@@ -364,7 +364,7 @@ def place_food(food_str, std, mapsize, mode, mode_input):
         g6=np.round(np.array([0.163636,     0.336363636])*mapsize).astype(int)
         g7=np.round(np.array([0.750909091,  0.218181818])*mapsize).astype(int)
         g8=np.round(np.array([0.654545455,  0.265454545])*mapsize).astype(int)
-        g9=np.round(np.array([0.578181818,  0.290909091])*mapsize).astype(int)
+        g9=np.round(np.array([0.590909,     0.3])*mapsize).astype(int)
         g10=np.round(np.array([0.654545455, 0.318181818])*mapsize).astype(int)
         g11=np.round(np.array([0.527272727, 0.349090909])*mapsize).astype(int)
         g12=np.round(np.array([0.454545455, 0.361818182])*mapsize).astype(int)
@@ -381,8 +381,8 @@ def place_food(food_str, std, mapsize, mode, mode_input):
         g23=np.round(np.array([0.836364,    0.792727273])*mapsize).astype(int)
         g24=np.round(np.array([0.785455,    0.854545])*mapsize).astype(int)
         g25=np.round(np.array([0.54,	    0.854545])*mapsize).astype(int)
-
-        food_positions = np.flip(np.array([g1, g2, g3, g4, g5, g6, g7, g8, g9, g10, g11, g12, g14, g15, g16, g17, g18, g19, g20, g21, g22, g23, g24, g25]))
+        g26=np.round(np.array([0.38,	    0.48182])*mapsize).astype(int)
+        food_positions = np.flip(np.array([g1, g2, g3, g4, g5, g6, g7, g8, g9, g10, g11, g12, g14, g15, g16, g17, g18, g19, g20, g21, g22, g23, g24, g25, g26]))
         # food_positions = np.round(food_positions*0.8+ 0.1*mapsize).astype(int)
         foodmap[food_positions[:, 0], food_positions[:, 1]] = food_str
 
