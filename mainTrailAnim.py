@@ -3,6 +3,8 @@ import numpy as np
 from matplotlib import pyplot as plt
 from timeit import default_timer as timer
 import matplotlib.animation as animation
+import scipy.ndimage
+import scipy.spatial
 
 '''
 TODO list in functions.py (list is not in any way ordered by priority)
@@ -10,7 +12,7 @@ TODO list in functions.py (list is not in any way ordered by priority)
 
 
 def run_simulation(max_steps, N_part, SA, SO, trailmap, mapsize, foodmap, RA, SS, decayT, show_animation_on, save_animation, show_food,
-                   bc_type, depT, steps_to_plot):#, boundrydict):
+                   bc_type, depT, steps_to_plot, boundrydict):
     '''
     Function that runs the simulation
 
@@ -33,11 +35,11 @@ def run_simulation(max_steps, N_part, SA, SO, trailmap, mapsize, foodmap, RA, SS
             lengths = []
             
 
-    x, y, theta = initialize_positions(mapsize, N_part, "square", 90, 'c') #,boundrydict) # Position either list of coordinates or 'c' for center
+    x, y, theta = initialize_positions(mapsize, N_part, "square", 90, 'c',boundrydict) # Position either list of coordinates or 'c' for center
     for step in range(max_steps):
         # print(step)
         theta += sense(x, y, theta, SA, SO, trailmap, mapsize, foodmap, RA, bc_type)
-        x, y, theta = move(theta, x, y, SS)
+        x, y, theta = move(theta, x, y, SS, boundrydict)
         x, y, theta = boundary_conditions(x, y, theta, mapsize, bc_type)
         trailmap = deposit(x, y, trailmap, depT)
         trailmap = diffuse(trailmap)
@@ -105,11 +107,11 @@ def main():
 
     foodmap = place_food(food_str, std, mapsize, mode, mode_input)
 
-    #gbg = r"../MapRef/GothenburgCropedBridge.png"
-    #tokyo = r"../MapRef/Tokyo.png"
-
-    #boundrydict = image_to_matrix(gbg, mapsize)
-
+    gbg = r"MapRef/GothenburgCropedBridge.png"
+    tokyo = r"MapRef/TokyoWhite.png"
+    boundrydict = {}
+    #boundrydict = image_to_matrix(tokyo, mapsize)
+    
     show_animation_on = True
     save_animation = False
     # For trail animation (way faster than agent animation). Also possible to save
@@ -124,7 +126,7 @@ def main():
     steps_to_plot = []
 
     run_simulation(max_steps, N_part, SA, SO, trailmap, mapsize, foodmap, RA, SS, decayT, show_animation_on, save_animation, show_food,
-                   bc_type, depT, steps_to_plot) #boundrydict
+                   bc_type, depT, steps_to_plot, boundrydict)
 
 if __name__ == "__main__":
     main()

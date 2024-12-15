@@ -118,7 +118,7 @@ def decay(trailmap, decayT):
 
     return trailmap
 
-def move(theta, x, y, SS):
+def move(theta, x, y, SS, boundrydict):
     '''
     Function to move the particles
     Input:
@@ -136,7 +136,8 @@ def move(theta, x, y, SS):
     ny = y + SS * np.sin(theta)
     same_pos_index = [0]
     tries = 0
-    while len(same_pos_index) != 0 and tries < 3: # The "< 3" should not be needed here but sometimes it gets stuck with two particles in the same spot so i cheated a bit but will try to fix
+    in_barrier_index = []
+    while len(same_pos_index) != 0 or len(in_barrier_index) !=0 and tries < 3: # The "< 3" should not be needed here but sometimes it gets stuck with two particles in the same spot so i cheated a bit but will try to fix
         nxint = np.round(nx)
         nyint = np.round(ny)
 
@@ -144,10 +145,13 @@ def move(theta, x, y, SS):
             
         dist = scipy.spatial.distance.cdist(npos, npos) + np.eye(N_part)
         same_pos_index = np.where(dist == 0)[0]
-
+        in_barrier_index = [i for i in range(len(npos)) if (npos[i][0], npos[i][1]) in boundrydict]
         nx[same_pos_index] = x[same_pos_index]
         ny[same_pos_index] = y[same_pos_index]
         theta[same_pos_index] = 2 * (np.random.rand(len(same_pos_index)) - 0.5) * np.pi
+        nx[in_barrier_index] = x[in_barrier_index]
+        ny[in_barrier_index] = y[in_barrier_index]
+        theta[in_barrier_index] = 2 * (np.random.rand(len(in_barrier_index)) - 0.5) * np.pi
         tries += 1
     #print(same_pos_index) # Really useful print to check collisions
 
@@ -157,7 +161,7 @@ def move(theta, x, y, SS):
 
     return nx, ny, theta
 
-def initialize_positions(mapsize, N_part, mode, radius, position): # boundrydict
+def initialize_positions(mapsize, N_part, mode, radius, position, boundrydict):
     '''
     Function for initializing the positions and orientations of the agents.
 
@@ -208,15 +212,15 @@ def initialize_positions(mapsize, N_part, mode, radius, position): # boundrydict
         y = np.random.randint(5, mapsize-5, N_part)
 
     same_pos_index = [0]
-    #in_barrier_index = []
-    while len(same_pos_index) != 0:
+    in_barrier_index = []
+    while len(same_pos_index) != 0 or len(in_barrier_index) != 0:
         xint = np.round(x)
         yint = np.round(y)
         pos = np.vstack([xint, yint]).T
 
         dist = scipy.spatial.distance.cdist(pos, pos) + np.eye(N_part)
         same_pos_index = np.where(dist == 0)[0]
-        #in_barrier_index = [i for i in range(len(pos)) if pos[i][:] in boundrydict]
+        in_barrier_index = [i for i in range(len(pos)) if (pos[i][0], pos[i][1]) in boundrydict]
 
         if mode == "circle":
             r = np.sqrt(np.random.rand(len(same_pos_index))) * radius
@@ -226,8 +230,8 @@ def initialize_positions(mapsize, N_part, mode, radius, position): # boundrydict
         if mode == "square":
             x[same_pos_index] = np.random.randint(5, mapsize-5, len(same_pos_index))
             y[same_pos_index] = np.random.randint(5, mapsize-5, len(same_pos_index))
-            #x[in_barrier_index] = np.random.randint(5, mapsize-5, len(in_barrier_index))
-            #y[in_barrier_index] = np.random.randint(5, mapsize-5, len(in_barrier_index))
+            x[in_barrier_index] = np.random.randint(5, mapsize-5, len(in_barrier_index))
+            y[in_barrier_index] = np.random.randint(5, mapsize-5, len(in_barrier_index))
 
     theta = 2 * (np.random.rand(N_part) - 0.5) * np.pi  # in [-pi, pi]
 
@@ -418,11 +422,11 @@ def place_food(food_str, std, mapsize, mode, mode_input):
         t32=np.round(np.array([0.28125,	0.69125])*mapsize).astype(int)
         t33=np.round(np.array([0.23125,	0.69375])*mapsize).astype(int)
         t34=np.round(np.array([0.1625,  0.725])*mapsize).astype(int)
-        #t35=np.round(np.array([0.11875,	0.925])*mapsize).astype(int) # To close to others
+        t35=np.round(np.array([0.42,	0.525])*mapsize).astype(int)
 
     
 
-        food_positions = np.flip(np.array([t2, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t17, t18, t19, t20, t21, t22, t23, t24, t25, t26, t27, t28, t29, t30, t31, t32, t33, t34]))
+        food_positions = np.flip(np.array([t2, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t17, t18, t19, t20, t21, t22, t23, t24, t25, t26, t27, t28, t29, t30, t31, t32, t33, t34, t35]))
         #food_positions = np.round(food_positions*0.8+ 0.1*mapsize).astype(int)
         foodmap[food_positions[:, 0], food_positions[:, 1]] = food_str
 
@@ -637,8 +641,8 @@ def image_to_matrix(image_path, mapsize):
     
     img = cv2.imread(image_path)
 
-    # 550x550 before resize
-    # Resize the image to 200x200
+    # 550x550 for gbg and 800x800 for tokyo before resize
+    # Resize the image to mapsize x mapsize
     img2 = cv2.resize(img, matrix_size)
 
     # Initialize the matrix with zeros (sea)
@@ -658,7 +662,7 @@ def image_to_matrix(image_path, mapsize):
                 matrix[y, x] = 0
 
     boundrylist = np.argwhere(matrix != 0)
-    boundrydict = {(i,j) : matrix[i][j] for i,j in boundrylist}
+    boundrydict = {(i, j) : matrix[i][j] for i,j in boundrylist}
 
     return boundrydict
 
