@@ -378,7 +378,7 @@ def place_food(food_str, std, mapsize, mode, mode_input):
         g24=np.round(np.array([0.785455,    0.854545])*mapsize).astype(int)
         g25=np.round(np.array([0.54,	    0.854545])*mapsize).astype(int)
 
-        food_positions = np.flip(np.array([g1, g2, g3, g4, g5, g6, g7, g8, g9, g10, g11, g12, g13, g14, g15, g16, g17, g18, g19, g20, g21, g22, g23, g24, g25]))
+        food_positions = np.flip(np.array([g1, g2, g3, g4, g5, g6, g7, g8, g9, g10, g11, g12, g14, g15, g16, g17, g18, g19, g20, g21, g22, g23, g24, g25]))
         # food_positions = np.round(food_positions*0.8+ 0.1*mapsize).astype(int)
         foodmap[food_positions[:, 0], food_positions[:, 1]] = food_str
 
@@ -422,7 +422,7 @@ def place_food(food_str, std, mapsize, mode, mode_input):
 
     
 
-        food_positions = np.flip(np.array([t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19, t20, t21, t22, t23, t24, t25, t26, t27, t28, t29, t30, t31, t32, t33, t34, t35]))
+        food_positions = np.flip(np.array([t2, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t17, t18, t19, t20, t21, t22, t23, t24, t25, t26, t27, t28, t29, t30, t31, t32, t33, t34]))
         #food_positions = np.round(food_positions*0.8+ 0.1*mapsize).astype(int)
         foodmap[food_positions[:, 0], food_positions[:, 1]] = food_str
 
