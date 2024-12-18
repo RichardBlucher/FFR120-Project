@@ -3,6 +3,8 @@ import numpy as np
 from matplotlib import pyplot as plt
 from timeit import default_timer as timer
 import matplotlib.animation as animation
+import scipy.ndimage
+import scipy.spatial
 
 '''
 TODO list in functions.py (list is not in any way ordered by priority)
@@ -10,7 +12,7 @@ TODO list in functions.py (list is not in any way ordered by priority)
 
 
 def run_simulation(max_steps, N_part, SA, SO, trailmap, mapsize, foodmap, RA, SS, decayT, show_animation_on, save_animation, show_food,
-                   bc_type, depT, steps_to_plot):#, boundrydict):
+                   bc_type, depT, steps_to_plot, boundrydict):
     '''
     Function that runs the simulation
 
@@ -33,11 +35,11 @@ def run_simulation(max_steps, N_part, SA, SO, trailmap, mapsize, foodmap, RA, SS
             lengths = []
             
 
-    x, y, theta = initialize_positions(mapsize, N_part, "square", 90, 'c') #,boundrydict) # Position either list of coordinates or 'c' for center
+    x, y, theta = initialize_positions(mapsize, N_part, "square", 90, 'c',boundrydict) # Position either list of coordinates or 'c' for center
     for step in range(max_steps):
         # print(step)
         theta += sense(x, y, theta, SA, SO, trailmap, mapsize, foodmap, RA, bc_type)
-        x, y, theta = move(theta, x, y, SS)
+        x, y, theta = move(theta, x, y, SS, boundrydict)
         x, y, theta = boundary_conditions(x, y, theta, mapsize, bc_type)
         trailmap = deposit(x, y, trailmap, depT)
         trailmap = diffuse(trailmap)
@@ -68,9 +70,9 @@ def run_simulation(max_steps, N_part, SA, SO, trailmap, mapsize, foodmap, RA, SS
 
 def main():
     # Initialization
-    max_steps = 10000  # Number of steps to run simulation
-    mapsize = 200  # Dimension of the squared arena.
-    percent_p = 3  # Population as percentage of image area
+    max_steps = 3200  # Number of steps to run simulation
+    mapsize = 250  # Dimension of the squared arena.
+    percent_p = 3.3  # Population as percentage of image area
     N_part = int(mapsize * mapsize * percent_p / 100)  # Number of particles.
 
     SS = 1  # Step size (how far agent moves per step)
@@ -96,7 +98,7 @@ def main():
 
     food_str = 10
     std = 2
-    mode = 'tokyo' # Options on how to place food: 'none', 'random', 'manual', 'square', 'triangle'. Different modes require different inputs, see function description for more info
+    mode = 'gothenburg' # Options on how to place food: 'none', 'random', 'manual', 'square', 'triangle'. Different modes require different inputs, see function description for more info
     coords = [[150, 150], [140, 30], [80, 160], [120, 90]] # Example of input to 'manual'
     width = 60 # Example of input to 'square' or 'triangle'
     mode_input = 5
@@ -105,11 +107,11 @@ def main():
 
     foodmap = place_food(food_str, std, mapsize, mode, mode_input)
 
-    #gbg = r"../MapRef/GothenburgCropedBridge.png"
-    #tokyo = r"../MapRef/Tokyo.png"
-
-    #boundrydict = image_to_matrix(gbg, mapsize)
-
+    gbg = r"MapRef/GothenburgCropedBridge.png"
+    tokyo = r"MapRef/TokyoWhite.png"
+    #boundrydict = {}
+    boundrydict = image_to_matrix(gbg, mapsize)
+    
     show_animation_on = True
     save_animation = False
     # For trail animation (way faster than agent animation). Also possible to save
@@ -119,12 +121,12 @@ def main():
 
     # For trail plots
     # steps_to_plot = [50, 100, 150, 200]  # list with times to plot. If you don't want to plot, make steps_to_plot = []
-    # steps_to_plot = [2, 22, 99, 175, 367, 512, 1740, 4151]
+    steps_to_plot = [1740, 3151]
     # steps_to_plot = [1000, 2000, 4000, 6000, 8000, 10000, 12000, 15000]
-    steps_to_plot = []
+    #steps_to_plot = []
 
     run_simulation(max_steps, N_part, SA, SO, trailmap, mapsize, foodmap, RA, SS, decayT, show_animation_on, save_animation, show_food,
-                   bc_type, depT, steps_to_plot) #boundrydict
+                   bc_type, depT, steps_to_plot, boundrydict)
 
 if __name__ == "__main__":
     main()
